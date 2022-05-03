@@ -19,7 +19,7 @@ type MemCache struct {
 	mu    sync.RWMutex
 }
 
-func NewCache() *MemCache {
+func NewMemCache() *MemCache {
 	return &MemCache{
 		cache: make(map[string]string, 0),
 		mu:    sync.RWMutex{},
@@ -33,10 +33,6 @@ func (c *MemCache) Set(key, value string) error {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	if _, ok := c.cache[key]; ok {
-		return errors.New("key already exist")
-	}
 
 	c.cache[key] = value
 
@@ -57,4 +53,21 @@ func (c *MemCache) Get(key string) (string, error) {
 	}
 
 	return v, nil
+}
+
+func (c *MemCache) Delete(key string) error {
+	if len(key) == 0 {
+		return ErrCannotBeEmpty
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	//if _, ok := c.cache[key]; !ok {
+	//	return ErrNotFound
+	//}
+
+	delete(c.cache, key)
+
+	return nil
 }
